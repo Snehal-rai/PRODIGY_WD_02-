@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .stopwatch-container {
+      text-align: center;
+      max-width: 400px;
+      margin: auto;
+      background-color: #fff;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .stopwatch-header {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .display {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .controls button {
+      font-size: 1em;
+      margin: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #lapList {
+      list-style-type: none;
+      padding: 0;
+      margin: 10px 0;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 5px;
+      background-color: #f9f9f9;
+    }
+
+    #lapList li {
+      margin: 5px 0;
+    }
+
+    .stopwatch-image {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+  </style>
+  <title>Stopwatch</title>
+</head>
+<body>
+  <div class="stopwatch-container">
+    <div class="stopwatch-header">Stopwatch</div>
+    <img class="stopwatch-image" src="C:\Users\HP\Downloads\stopwatch.jpg" alt="Stopwatch Image">
+    <div class="display">
+      <span id="minutes">00</span>:<span id="seconds">00</span>:<span id="milliseconds">00</span>
+    </div>
+    <div class="controls">
+      <button id="startBtn" onclick="startStopwatch()">Start</button>
+      <button id="pauseBtn" onclick="pauseStopwatch()" disabled>Pause</button>
+      <button id="resetBtn" onclick="resetStopwatch()" disabled>Reset</button>
+      <button id="lapBtn" onclick="recordLap()" disabled>Lap</button>
+    </div>
+    <ul id="lapList"></ul>
+  </div>
+  <script>
+    let startTime;
+    let elapsedTime = 0;
+    let timerInterval;
+    let isRunning = false;
+
+    function startStopwatch() {
+      if (!isRunning) {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(updateTime, 10);
+        document.getElementById('startBtn').innerText = 'Pause';
+        document.getElementById('pauseBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('lapBtn').disabled = false;
+        isRunning = true;
+      } else {
+        clearInterval(timerInterval);
+        document.getElementById('startBtn').innerText = 'Resume';
+        isRunning = false;
+      }
+    }
+
+    function pauseStopwatch() {
+      clearInterval(timerInterval);
+      document.getElementById('startBtn').innerText = 'Resume';
+      isRunning = false;
+    }
+
+    function resetStopwatch() {
+      clearInterval(timerInterval);
+      elapsedTime = 0;
+      updateDisplay();
+      document.getElementById('startBtn').innerText = 'Start';
+      document.getElementById('pauseBtn').disabled = true;
+      document.getElementById('resetBtn').disabled = true;
+      document.getElementById('lapBtn').disabled = true;
+      isRunning = false;
+      clearLapList();
+    }
+
+    function updateTime() {
+      const currentTime = Date.now();
+      elapsedTime = currentTime - startTime;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const minutes = Math.floor(elapsedTime / (60 * 1000)).toString().padStart(2, '0');
+      const seconds = Math.floor((elapsedTime % (60 * 1000)) / 1000).toString().padStart(2, '0');
+      const milliseconds = Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0');
+
+      document.getElementById('minutes').innerText = minutes;
+      document.getElementById('seconds').innerText = seconds;
+      document.getElementById('milliseconds').innerText = milliseconds;
+    }
+
+    function recordLap() {
+      const lapTime = elapsedTime;
+      const lapListItem = document.createElement('li');
+      lapListItem.innerText = formatLapTime(lapTime);
+      document.getElementById('lapList').appendChild(lapListItem);
+    }
+
+    function clearLapList() {
+      const lapList = document.getElementById('lapList');
+      while (lapList.firstChild) {
+        lapList.removeChild(lapList.firstChild);
+      }
+    }
+
+    function formatLapTime(time) {
+      const minutes = Math.floor(time / (60 * 1000)).toString().padStart(2, '0');
+      const seconds = Math.floor((time % (60 * 1000)) / 1000).toString().padStart(2, '0');
+      const milliseconds = Math.floor((time % 1000) / 10).toString().padStart(2, '0');
+      return `${minutes}:${seconds}:${milliseconds}`;
+    }
+  </script>
+</body>
+</html>
